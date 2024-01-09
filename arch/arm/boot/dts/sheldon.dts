@@ -20,21 +20,39 @@
 	model = "MediaTek MT8695P1 1G DRAM Board";
 	compatible = "mediatek,mt8695p1-1.5g", "mediatek,mt8695";
 
-	memory@40000000 {
-		device_type = "memory";
-		reg = <0 0x40000000 0 0x40000000>;
-	};
-
 	extcon_usb: extcon_iddig {
 		compatible = "linux,extcon-usb-gpio";
 		id-gpio = <&pio 55 GPIO_ACTIVE_HIGH>;
 	};
 
 	chosen {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
 		bootargs = "console=tty0 console=ttyS1,921600n1 \
-earlycon=uart8250,mmio32,0x11003000 root=/dev/ram initrd=0x44000000,0x600000 \
+earlycon=mtk8250,0x11003000 root=/dev/ram initrd=0x44000000,0x600000 \
 loglevel=8 initcall_debug=1 androidboot.selinux=permissive \
 androidboot.hardware=mt8695 androidboot.serialno=0123456789ABCDEF";
+
+		framebuffer: framebuffer@905c0000 {
+			compatible = "simple-framebuffer";
+			reg = <0 0x905c0000 0 0x1800000>;
+			width = <1920>;
+			height = <1080>;
+			stride = <(1920 * 4)>;
+			format = "a8r8g8b8";
+		};
+	};
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0 0x40000000 0 0x51dc0000>;
+	};
+	reserved-memory {
+		fb_mem: memory@905c0000 {
+			reg = <0 0x905c0000 0 0x1800000>;
+			no-map;
+		};
 	};
 
 	mmc_fixed_3v3: fixedregulator@0 {
